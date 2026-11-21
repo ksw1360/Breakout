@@ -205,7 +205,7 @@ public static class BreakoutSceneBuilder
         return clip;
     }
 
-    static Text CreateText(string name, Transform parent, Font font, int size, TextAnchor anchor,
+    internal static Text CreateText(string name, Transform parent, Font font, int size, TextAnchor anchor,
         Vector2 pivotAnchor, Vector2 offset)
     {
         var go = new GameObject(name, typeof(RectTransform));

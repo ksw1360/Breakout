@@ -55,11 +55,18 @@ public class GameManager : MonoBehaviour
 
         if (bricksRemaining <= 0)
         {
-            IsGameOver = true;
             ball.Stop();
             SoundManager.Clear();
-            ShowMessage($"YOU WIN!\nScore: {Score}\nPress R to restart");
+            EndGame("YOU WIN!");
         }
+    }
+
+    void EndGame(string title)
+    {
+        IsGameOver = true;
+        int rank = HighScores.Submit(Score);
+        string rankLine = rank > 0 ? $"\nNEW HIGH SCORE!  #{rank}" : "";
+        ShowMessage($"{title}\nScore: {Score}{rankLine}\nPress R to restart");
     }
 
     public void OnBallLost()
@@ -70,11 +77,10 @@ public class GameManager : MonoBehaviour
 
         if (Lives <= 0)
         {
-            IsGameOver = true;
             ball.Stop();
             ball.gameObject.SetActive(false);
             SoundManager.GameOver();
-            ShowMessage($"GAME OVER\nScore: {Score}\nPress R to restart");
+            EndGame("GAME OVER");
         }
         else
         {
