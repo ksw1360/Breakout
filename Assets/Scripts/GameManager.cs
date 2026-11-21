@@ -43,7 +43,24 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        if (!ValidateReferences()) return;
         LoadLevel(1);
+    }
+
+    /// <summary>씬이 현재 코드보다 오래된 경우(빌더 재실행 필요) 조용히 망가지지 않도록 검사.</summary>
+    bool ValidateReferences()
+    {
+        var missing = new System.Collections.Generic.List<string>();
+        if (!ball) missing.Add(nameof(ball));
+        if (!brickField) missing.Add(nameof(brickField));
+        if (missing.Count == 0) return true;
+
+        string msg = $"Scene is out of date (missing: {string.Join(", ", missing)}).\nRun Tools > Build Breakout Scene";
+        Debug.LogError($"[Breakout] {msg.Replace('\n', ' ')}", this);
+        ShowMessage(msg);
+        if (ball) ball.Stop();
+        IsGameOver = true; // 입력 차단 (R/ESC만 동작)
+        return false;
     }
 
     void Update()

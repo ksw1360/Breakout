@@ -37,6 +37,8 @@ public static class BuildSettingsOrder
         {
             EditorBuildSettings.scenes = result.ToArray();
             AssetDatabase.SaveAssets(); // ProjectSettings를 디스크에 반영
+            UnityEngine.Debug.Log("[Breakout] Build Settings 씬 순서: " +
+                string.Join(" → ", result.Select((s, i) => $"{i}:{Path.GetFileNameWithoutExtension(s.path)}")));
         }
     }
 }
