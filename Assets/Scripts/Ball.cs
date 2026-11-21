@@ -23,18 +23,19 @@ public class Ball : MonoBehaviour
     public float CurrentSpeed { get; private set; }
     public float MaxSpeed => baseSpeed * maxSpeedMultiplier;
     public bool IsLaunched => launched;
+    public Vector2 Direction => rb.linearVelocity.sqrMagnitude > 0.0001f ? rb.linearVelocity.normalized : Vector2.up;
+    public Collider2D Collider { get; private set; }
+
+    // 느리게 아이템 등 전역 배율을 적용한 실제 속도
+    float EffectiveSpeed => CurrentSpeed * (GameManager.Instance ? GameManager.Instance.BallSpeedScale : 1f);
 
     void SpeedUp() => CurrentSpeed = Mathf.Min(CurrentSpeed + speedStepPerHit, MaxSpeed);
 
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        Collider = GetComponent<Collider2D>();
         CurrentSpeed = baseSpeed;
-    }
-
-    void Start()
-    {
-        ResetToPaddle();
     }
 
     void Update()
@@ -66,15 +67,27 @@ public class Ball : MonoBehaviour
             v.y = minVerticalRatio * (v.y >= 0f ? 1f : -1f);
             v.x = Mathf.Sign(v.x) * Mathf.Sqrt(1f - v.y * v.y);
         }
-        rb.linearVelocity = v * CurrentSpeed;
+        rb.linearVelocity = v * EffectiveSpeed;
     }
 
     void Launch()
     {
         launched = true;
         float angle = Random.Range(-30f, 30f) * Mathf.Deg2Rad;
-        rb.linearVelocity = new Vector2(Mathf.Sin(angle), Mathf.Cos(angle)) * CurrentSpeed;
+        rb.linearVelocity = new Vector2(Mathf.Sin(angle), Mathf.Cos(angle)) * EffectiveSpeed;
         GameManager.Instance?.OnBallLaunched();
+    }
+
+    /// <summary>멀티볼용: 지정 위치에서 지정 방향/속도로 바로 발사된 상태로 만든다.</summary>
+    public void LaunchFrom(Vector2 position, Vector2 direction, float speed)
+    {
+        gameObject.SetActive(true);
+        enabled = true;
+        launched = true;
+        CurrentSpeed = Mathf.Min(speed, MaxSpeed);
+        rb.position = position;
+        transform.position = position;
+        rb.linearVelocity = direction.normalized * EffectiveSpeed;
     }
 
     public void ResetToPaddle()
@@ -107,7 +120,7 @@ public class Ball : MonoBehaviour
             offset = Mathf.Clamp(offset, -1f, 1f);
             float angle = offset * maxBounceAngle * Mathf.Deg2Rad;
             SpeedUp();
-            rb.linearVelocity = new Vector2(Mathf.Sin(angle), Mathf.Cos(angle)) * CurrentSpeed;
+            rb.linearVelocity = new Vector2(Mathf.Sin(angle), Mathf.Cos(angle)) * EffectiveSpeed;
             SoundManager.PaddleHit();
         }
         else if (collision.collider.GetComponent<Brick>() != null)

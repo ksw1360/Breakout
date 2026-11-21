@@ -91,4 +91,14 @@ for f in (523, 659, 784):
     clr += tone(f, f, 0.12, "square", 0.28)
 clr += tone(1047, 1047, 0.5, "square", 0.28)
 save("Clear.wav", clr)
+
+# 아이템 획득: 빠르게 올라가는 반짝 소리 / 나쁜 아이템: 내려가는 소리
+up = []
+for f in (660, 880, 1175, 1568):
+    up += tone(f, f * 1.02, 0.055, "triangle", 0.4)
+save("PowerUp.wav", up)
+down = []
+for f in (784, 587, 392):
+    down += tone(f, f * 0.95, 0.08, "square", 0.22)
+save("PowerDown.wav", down)
 print(sorted(os.listdir(out)))

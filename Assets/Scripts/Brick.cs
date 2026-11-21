@@ -43,6 +43,7 @@ public class Brick : MonoBehaviour
         destroyed = true;
         SoundManager.BrickHit();
         GameManager.Instance?.OnBrickDestroyed(points);
+        if (ItemManager.Instance) ItemManager.Instance.TryDrop(transform.position); // 클리어 순간엔 내부에서 무시
         Destroy(gameObject);
     }
 }

@@ -156,6 +156,14 @@ public static class BreakoutSceneBuilder
         fireworks.areaMax = new Vector2(ArenaHalfWidth - 1.5f, ArenaTop - 1.5f);
         gm.fireworks = fireworks;
 
+        // 아이템
+        var itemGo = new GameObject("Items");
+        var items = itemGo.AddComponent<ItemManager>();
+        items.paddle = paddle;
+        items.material = spriteMat;
+        items.missY = -CameraSize - 0.5f;
+        gm.itemManager = items;
+
         // 사운드 (카메라에 AudioListener 필요)
         camGo.AddComponent<AudioListener>();
         var soundGo = new GameObject("SoundManager");
@@ -168,6 +176,8 @@ public static class BreakoutSceneBuilder
         sound.ballLost = LoadClip("BallLost");
         sound.gameOver = LoadClip("GameOver");
         sound.clear = LoadClip("Clear");
+        sound.powerUp = LoadClip("PowerUp");
+        sound.powerDown = LoadClip("PowerDown");
 
         // 씬 저장 + 빌드 설정에 등록
         Directory.CreateDirectory(Path.GetDirectoryName(ScenePath));

@@ -12,6 +12,8 @@ public class SoundManager : MonoBehaviour
     public AudioClip ballLost;
     public AudioClip gameOver;
     public AudioClip clear;
+    public AudioClip powerUp;
+    public AudioClip powerDown;
 
     [Range(0f, 1f)] public float volume = 0.8f;
 
@@ -75,4 +77,6 @@ public class SoundManager : MonoBehaviour
     public static void BallLost()  => PlayStatic(m => m.ballLost);
     public static void GameOver()  => PlayStatic(m => m.gameOver);
     public static void Clear()     => PlayStatic(m => m.clear);
+    public static void PowerUp()   => PlayStatic(m => m.powerUp);
+    public static void PowerDown() => PlayStatic(m => m.powerDown);
 }
