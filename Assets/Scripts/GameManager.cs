@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     public Text scoreText;
     public Text livesText;
     public Text messageText;
+    public Fireworks fireworks;
 
     [Header("Rules")]
     public int startLives = 3;
@@ -62,6 +63,7 @@ public class GameManager : MonoBehaviour
         {
             ball.Stop();
             SoundManager.Clear();
+            if (fireworks) fireworks.Play();
             EndGame("YOU WIN!");
         }
     }

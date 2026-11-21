@@ -10,6 +10,7 @@ public static class BreakoutSceneBuilder
     const string SpriteFolder = "Assets/Sprites";
     const string PhysicsFolder = "Assets/Physics";
     const string AudioFolder = "Assets/Audio";
+    const string FireworkMatPath = "Assets/Materials/Firework.mat";
     const string SquarePath = SpriteFolder + "/Square.png";
     const string CirclePath = SpriteFolder + "/Circle.png";
     const string BounceMatPath = PhysicsFolder + "/BallBounce.physicsMaterial2D";
@@ -162,6 +163,14 @@ public static class BreakoutSceneBuilder
         gm.livesText = livesText;
         gm.messageText = messageText;
 
+        // 폭죽
+        var fwGo = new GameObject("Fireworks");
+        var fireworks = fwGo.AddComponent<Fireworks>();
+        fireworks.particleMaterial = GetOrCreateFireworkMaterial(spriteMat, circle);
+        fireworks.areaMin = new Vector2(-ArenaHalfWidth + 1.5f, -0.5f);
+        fireworks.areaMax = new Vector2(ArenaHalfWidth - 1.5f, ArenaTop - 1.5f);
+        gm.fireworks = fireworks;
+
         // 사운드 (카메라에 AudioListener 필요)
         camGo.AddComponent<AudioListener>();
         var soundGo = new GameObject("SoundManager");
@@ -195,6 +204,23 @@ public static class BreakoutSceneBuilder
         if (mat) sr.sharedMaterial = mat;
         go.AddComponent<BoxCollider2D>(); // 스프라이트 크기(1x1)에 맞춰 자동 설정, 스케일 적용됨
         return go;
+    }
+
+    static Material GetOrCreateFireworkMaterial(Material spriteMat, Sprite circle)
+    {
+        var mat = AssetDatabase.LoadAssetAtPath<Material>(FireworkMatPath);
+        if (mat) return mat;
+        if (spriteMat == null)
+        {
+            Debug.LogWarning("[Breakout] Sprite-Unlit-Default 머티리얼을 찾지 못해 폭죽 머티리얼을 만들 수 없습니다.");
+            return null;
+        }
+
+        Directory.CreateDirectory(Path.GetDirectoryName(FireworkMatPath));
+        mat = new Material(spriteMat) { name = "Firework", mainTexture = circle.texture };
+        AssetDatabase.CreateAsset(mat, FireworkMatPath);
+        AssetDatabase.SaveAssets();
+        return mat;
     }
 
     static AudioClip LoadClip(string name)
