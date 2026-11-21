@@ -24,6 +24,11 @@ public class ItemManager : MonoBehaviour
     [Range(0.1f, 1f)] public float slowMultiplier = 0.6f;
     public float slowDuration = 5f;
 
+    [Header("Debug")]
+    [Tooltip("I 키로 패들 위에 랜덤 아이템 떨어뜨리기 (테스트용)")]
+    public bool debugSpawnKey = true;
+    public float debugSpawnHeight = 3f;
+
     public float BallSpeedScale => slowTimer > 0f ? slowMultiplier : 1f;
 
     readonly List<Item> activeItems = new List<Item>();
@@ -57,6 +62,11 @@ public class ItemManager : MonoBehaviour
 
     void Update()
     {
+        // 테스트용: I 키 → 패들 위로 랜덤 아이템
+        var kb = UnityEngine.InputSystem.Keyboard.current;
+        if (debugSpawnKey && kb != null && kb.iKey.wasPressedThisFrame && IsPlaying && paddle)
+            Spawn(RandomType(), (Vector2)paddle.transform.position + Vector2.up * debugSpawnHeight);
+
         if (wideTimer > 0f)
         {
             wideTimer -= Time.deltaTime;
