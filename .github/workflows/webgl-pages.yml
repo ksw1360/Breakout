@@ -68,6 +68,11 @@ jobs:
         with:
           targetPlatform: WebGL
           unityVersion: auto # ProjectSettings/ProjectVersion.txt (6000.6.10f1)
+          # unity-builder@v4는 기본으로 이미지 버전 3(unityci/editor:ubuntu-<ver>-webgl-3)을 찾는데,
+          # 6000.6.10f1은 이미지 버전 4(...-webgl-4)로만 배포되어 있음 (2026-11 확인).
+          # 나중에 -webgl-3 태그가 생기거나 builder 기본값이 4가 되면 아래 줄을 지워도 됨.
+          # 특정 에디터 버전으로 고정하려면: unityVersion: 6000.6.x 로 바꾸고 이 줄은 유지.
+          containerRegistryImageVersion: '4'
 
       # 결과물: build/WebGL/WebGL/index.html
       - name: Upload Pages artifact
