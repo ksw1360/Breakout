@@ -61,3 +61,6 @@ mono_crash.*
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# Local WebGL build output (project root)
+/WebGL/
