@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Rules")]
     public int startLives = 3;
+    public string menuSceneName = "Menu";
 
     public int Score { get; private set; }
     public int Lives { get; private set; }
@@ -40,8 +41,12 @@ public class GameManager : MonoBehaviour
         var kb = Keyboard.current;
         if (kb == null) return;
 
-        if (IsGameOver && kb.rKey.wasPressedThisFrame)
+        if (!IsGameOver) return;
+
+        if (kb.rKey.wasPressedThisFrame)
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        else if (kb.escapeKey.wasPressedThisFrame)
+            SceneManager.LoadScene(menuSceneName);
     }
 
     public void RegisterBrick() => bricksRemaining++;
@@ -66,7 +71,7 @@ public class GameManager : MonoBehaviour
         IsGameOver = true;
         int rank = HighScores.Submit(Score);
         string rankLine = rank > 0 ? $"\nNEW HIGH SCORE!  #{rank}" : "";
-        ShowMessage($"{title}\nScore: {Score}{rankLine}\nPress R to restart");
+        ShowMessage($"{title}\nScore: {Score}{rankLine}\nR: Restart    ESC: Menu");
     }
 
     public void OnBallLost()
