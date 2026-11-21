@@ -25,7 +25,7 @@ public class ItemManager : MonoBehaviour
     public float slowDuration = 5f;
 
     [Header("Debug")]
-    [Tooltip("I 키로 패들 위에 랜덤 아이템 떨어뜨리기 (테스트용)")]
+    [Tooltip("I 키로 패들 위에 랜덤 아이템 떨어뜨리기 (테스트용, 에디터에서만 동작)")]
     public bool debugSpawnKey = true;
     public float debugSpawnHeight = 3f;
 
@@ -62,10 +62,12 @@ public class ItemManager : MonoBehaviour
 
     void Update()
     {
-        // 테스트용: I 키 → 패들 위로 랜덤 아이템
+#if UNITY_EDITOR
+        // 테스트용 치트 (에디터 전용, 빌드에서는 코드 자체가 제외됨): I 키 → 패들 위로 랜덤 아이템
         var kb = UnityEngine.InputSystem.Keyboard.current;
         if (debugSpawnKey && kb != null && kb.iKey.wasPressedThisFrame && IsPlaying && paddle)
             Spawn(RandomType(), (Vector2)paddle.transform.position + Vector2.up * debugSpawnHeight);
+#endif
 
         if (wideTimer > 0f)
         {

@@ -80,6 +80,17 @@ public class GameManager : MonoBehaviour
     {
         var kb = Keyboard.current;
         if (kb == null) return;
+
+#if UNITY_EDITOR
+        // 테스트용 치트 (에디터 전용, 빌드에서는 코드 자체가 제외됨): N 키 → 현재 레벨 즉시 클리어
+        if (kb.nKey.wasPressedThisFrame && IsPlaying)
+        {
+            Debug.Log($"[Breakout] Cheat: LEVEL {Level} skipped");
+            StageClear();
+            return;
+        }
+#endif
+
         if (!IsGameOver) return;
 
         if (kb.rKey.wasPressedThisFrame) Restart();
