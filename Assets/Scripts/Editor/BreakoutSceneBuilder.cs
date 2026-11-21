@@ -23,23 +23,11 @@ public static class BreakoutSceneBuilder
     const float ArenaTop = 5.5f;         // 천장 안쪽 y
     const float WallThickness = 0.5f;
 
-    // 블럭 배치
-    const int Columns = 10;
-    const int Rows = 6;
+    // 블럭 크기 (배치는 Levels.cs, 생성은 런타임 BrickField)
     const float BrickWidth = 1.3f;
     const float BrickHeight = 0.45f;
     const float BrickGap = 0.1f;
     const float BrickTopY = 4.5f;
-
-    static readonly Color[] RowColors =
-    {
-        new Color(0.95f, 0.30f, 0.30f), // 빨강
-        new Color(0.98f, 0.60f, 0.25f), // 주황
-        new Color(0.98f, 0.85f, 0.30f), // 노랑
-        new Color(0.40f, 0.85f, 0.40f), // 초록
-        new Color(0.35f, 0.65f, 0.98f), // 파랑
-        new Color(0.70f, 0.45f, 0.95f), // 보라
-    };
 
     [MenuItem("Tools/Build Breakout Scene")]
     public static void Build()
@@ -119,22 +107,15 @@ public static class BreakoutSceneBuilder
         var ball = ballGo.AddComponent<Ball>();
         ball.paddle = paddle;
 
-        // 블럭
-        var bricks = new GameObject("Bricks");
-        float totalWidth = Columns * BrickWidth + (Columns - 1) * BrickGap;
-        float startX = -totalWidth * 0.5f + BrickWidth * 0.5f;
-        for (int row = 0; row < Rows; row++)
-        {
-            float y = BrickTopY - row * (BrickHeight + BrickGap);
-            for (int col = 0; col < Columns; col++)
-            {
-                float x = startX + col * (BrickWidth + BrickGap);
-                var brickGo = CreateBlock($"Brick_{row}_{col}", bricks.transform, square, spriteMat,
-                    RowColors[row % RowColors.Length], new Vector2(x, y), new Vector2(BrickWidth, BrickHeight));
-                var brick = brickGo.AddComponent<Brick>();
-                brick.points = (Rows - row) * 10; // 위쪽 줄일수록 점수 높음
-            }
-        }
+        // 블럭 필드 (레벨마다 런타임에 블럭 생성)
+        var bricksGo = new GameObject("Bricks");
+        var brickField = bricksGo.AddComponent<BrickField>();
+        brickField.sprite = square;
+        brickField.material = spriteMat;
+        brickField.brickWidth = BrickWidth;
+        brickField.brickHeight = BrickHeight;
+        brickField.gap = BrickGap;
+        brickField.topY = BrickTopY;
 
         // UI
         var canvasGo = new GameObject("Canvas");
@@ -151,6 +132,8 @@ public static class BreakoutSceneBuilder
             new Vector2(0f, 1f), new Vector2(30f, -20f));
         var livesText = CreateText("LivesText", canvasGo.transform, font, 40, TextAnchor.UpperRight,
             new Vector2(1f, 1f), new Vector2(-30f, -20f));
+        var levelText = CreateText("LevelText", canvasGo.transform, font, 40, TextAnchor.UpperCenter,
+            new Vector2(0.5f, 1f), new Vector2(0f, -20f));
         var messageText = CreateText("MessageText", canvasGo.transform, font, 56, TextAnchor.MiddleCenter,
             new Vector2(0.5f, 0.5f), new Vector2(0f, -120f));
         messageText.rectTransform.sizeDelta = new Vector2(1200f, 400f);
@@ -159,6 +142,8 @@ public static class BreakoutSceneBuilder
         var gmGo = new GameObject("GameManager");
         var gm = gmGo.AddComponent<GameManager>();
         gm.ball = ball;
+        gm.brickField = brickField;
+        gm.levelText = levelText;
         gm.scoreText = scoreText;
         gm.livesText = livesText;
         gm.messageText = messageText;
@@ -179,6 +164,7 @@ public static class BreakoutSceneBuilder
         sound.paddleHit = LoadClip("PaddleHit");
         sound.wallHit = LoadClip("WallHit");
         sound.brickHit = LoadClip("BrickHit");
+        sound.hardHit = LoadClip("HardHit");
         sound.ballLost = LoadClip("BallLost");
         sound.gameOver = LoadClip("GameOver");
         sound.clear = LoadClip("Clear");

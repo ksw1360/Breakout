@@ -8,6 +8,7 @@ public class SoundManager : MonoBehaviour
     public AudioClip paddleHit;
     public AudioClip wallHit;
     public AudioClip brickHit;
+    public AudioClip hardHit;
     public AudioClip ballLost;
     public AudioClip gameOver;
     public AudioClip clear;
@@ -70,6 +71,7 @@ public class SoundManager : MonoBehaviour
     {
         if (Instance) Instance.PlayBrick();
     }
+    public static void HardHit()   => PlayStatic(m => m.hardHit);
     public static void BallLost()  => PlayStatic(m => m.ballLost);
     public static void GameOver()  => PlayStatic(m => m.gameOver);
     public static void Clear()     => PlayStatic(m => m.clear);

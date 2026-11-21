@@ -66,6 +66,8 @@ public class Ball : MonoBehaviour
 
     public void ResetToPaddle()
     {
+        gameObject.SetActive(true);
+        enabled = true;
         launched = false;
         rb.linearVelocity = Vector2.zero;
         if (paddle != null)
@@ -95,7 +97,7 @@ public class Ball : MonoBehaviour
         }
         else if (collision.collider.GetComponent<Brick>() != null)
         {
-            SoundManager.BrickHit();
+            // 블럭 소리는 Brick이 직접 재생 (깨짐 / 단단한 블럭 타격 구분)
         }
         else
         {

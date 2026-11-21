@@ -60,6 +60,15 @@ def glass_break(dur=0.5, seed=7, peak=0.35):
     m = max(abs(x) for x in s)
     return [x / m * peak for x in s]
 
+def metal_tink(dur=0.18, peak=0.3):
+    """단단한 블럭 타격: 짧고 둔탁한 금속성 '틱'."""
+    n = int(SR * dur)
+    parts = [(1180, 1.0, 0.045), (1730, 0.6, 0.035), (2650, 0.4, 0.025), (590, 0.5, 0.05)]
+    s = [sum(a * math.sin(2 * math.pi * f * i / SR) * math.exp(-(i / SR) / tau) for f, a, tau in parts)
+         for i in range(n)]
+    m = max(abs(x) for x in s)
+    return [x / m * peak for x in s]
+
 def silence(dur): return [0.0] * int(SR * dur)
 
 def save(name, samples):
@@ -70,6 +79,7 @@ def save(name, samples):
 save("PaddleHit.wav", tone(520, 520, 0.08, "square", 0.30))
 save("WallHit.wav",   tone(260, 240, 0.06, "triangle", 0.45))
 save("BrickHit.wav",  glass_break())
+save("HardHit.wav",  metal_tink())
 save("BallLost.wav",  tone(600, 120, 0.6, "triangle", 0.5))
 go = []
 for f in (440, 349, 262):
