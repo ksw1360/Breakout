@@ -91,6 +91,15 @@ public class Ball : MonoBehaviour
             offset = Mathf.Clamp(offset, -1f, 1f);
             float angle = offset * maxBounceAngle * Mathf.Deg2Rad;
             rb.linearVelocity = new Vector2(Mathf.Sin(angle), Mathf.Cos(angle)) * speed;
+            SoundManager.PaddleHit();
+        }
+        else if (collision.collider.GetComponent<Brick>() != null)
+        {
+            SoundManager.BrickHit();
+        }
+        else
+        {
+            SoundManager.WallHit();
         }
     }
 }

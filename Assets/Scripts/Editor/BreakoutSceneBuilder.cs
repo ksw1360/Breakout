@@ -10,6 +10,7 @@ public static class BreakoutSceneBuilder
 {
     const string SpriteFolder = "Assets/Sprites";
     const string PhysicsFolder = "Assets/Physics";
+    const string AudioFolder = "Assets/Audio";
     const string SquarePath = SpriteFolder + "/Square.png";
     const string CirclePath = SpriteFolder + "/Circle.png";
     const string BounceMatPath = PhysicsFolder + "/BallBounce.physicsMaterial2D";
@@ -162,6 +163,18 @@ public static class BreakoutSceneBuilder
         gm.livesText = livesText;
         gm.messageText = messageText;
 
+        // 사운드 (카메라에 AudioListener 필요)
+        camGo.AddComponent<AudioListener>();
+        var soundGo = new GameObject("SoundManager");
+        soundGo.AddComponent<AudioSource>().playOnAwake = false;
+        var sound = soundGo.AddComponent<SoundManager>();
+        sound.paddleHit = LoadClip("PaddleHit");
+        sound.wallHit = LoadClip("WallHit");
+        sound.brickHit = LoadClip("BrickHit");
+        sound.ballLost = LoadClip("BallLost");
+        sound.gameOver = LoadClip("GameOver");
+        sound.clear = LoadClip("Clear");
+
         // 씬 저장 + 빌드 설정에 등록
         Directory.CreateDirectory(Path.GetDirectoryName(ScenePath));
         EditorSceneManager.SaveScene(scene, ScenePath);
@@ -183,6 +196,13 @@ public static class BreakoutSceneBuilder
         if (mat) sr.sharedMaterial = mat;
         go.AddComponent<BoxCollider2D>(); // 스프라이트 크기(1x1)에 맞춰 자동 설정, 스케일 적용됨
         return go;
+    }
+
+    static AudioClip LoadClip(string name)
+    {
+        var clip = AssetDatabase.LoadAssetAtPath<AudioClip>($"{AudioFolder}/{name}.wav");
+        if (clip == null) Debug.LogWarning($"[Breakout] 오디오 클립 없음: {AudioFolder}/{name}.wav");
+        return clip;
     }
 
     static Text CreateText(string name, Transform parent, Font font, int size, TextAnchor anchor,

@@ -57,6 +57,7 @@ public class GameManager : MonoBehaviour
         {
             IsGameOver = true;
             ball.Stop();
+            SoundManager.Clear();
             ShowMessage($"YOU WIN!\nScore: {Score}\nPress R to restart");
         }
     }
@@ -72,10 +73,12 @@ public class GameManager : MonoBehaviour
             IsGameOver = true;
             ball.Stop();
             ball.gameObject.SetActive(false);
+            SoundManager.GameOver();
             ShowMessage($"GAME OVER\nScore: {Score}\nPress R to restart");
         }
         else
         {
+            SoundManager.BallLost();
             ball.ResetToPaddle();
             ShowMessage("Press SPACE to launch");
         }
