@@ -1,11 +1,17 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class Ball : MonoBehaviour
 {
     public Paddle paddle;
-    public float speed = 8f;
+    [Tooltip("레벨 기본 속도 (GameManager가 레벨마다 설정)")]
+    [FormerlySerializedAs("speed")] public float baseSpeed = 8f;
+    [Tooltip("패들/블럭에 맞을 때마다 늘어나는 속도")]
+    public float speedStepPerHit = 0.12f;
+    [Tooltip("최대 속도 = 기본 속도 × 이 값")]
+    public float maxSpeedMultiplier = 1.5f;
     [Tooltip("패들 가장자리에 맞았을 때 최대 반사 각도(수직 기준)")]
     public float maxBounceAngle = 60f;
     [Tooltip("공이 너무 수평으로 날지 않도록 하는 최소 수직 성분 비율")]
@@ -14,9 +20,16 @@ public class Ball : MonoBehaviour
     Rigidbody2D rb;
     bool launched;
 
+    public float CurrentSpeed { get; private set; }
+    public float MaxSpeed => baseSpeed * maxSpeedMultiplier;
+    public bool IsLaunched => launched;
+
+    void SpeedUp() => CurrentSpeed = Mathf.Min(CurrentSpeed + speedStepPerHit, MaxSpeed);
+
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        CurrentSpeed = baseSpeed;
     }
 
     void Start()
@@ -53,14 +66,14 @@ public class Ball : MonoBehaviour
             v.y = minVerticalRatio * (v.y >= 0f ? 1f : -1f);
             v.x = Mathf.Sign(v.x) * Mathf.Sqrt(1f - v.y * v.y);
         }
-        rb.linearVelocity = v * speed;
+        rb.linearVelocity = v * CurrentSpeed;
     }
 
     void Launch()
     {
         launched = true;
         float angle = Random.Range(-30f, 30f) * Mathf.Deg2Rad;
-        rb.linearVelocity = new Vector2(Mathf.Sin(angle), Mathf.Cos(angle)) * speed;
+        rb.linearVelocity = new Vector2(Mathf.Sin(angle), Mathf.Cos(angle)) * CurrentSpeed;
         GameManager.Instance?.OnBallLaunched();
     }
 
@@ -69,6 +82,7 @@ public class Ball : MonoBehaviour
         gameObject.SetActive(true);
         enabled = true;
         launched = false;
+        CurrentSpeed = baseSpeed;
         rb.linearVelocity = Vector2.zero;
         if (paddle != null)
             rb.position = (Vector2)paddle.transform.position + Vector2.up * 0.45f;
@@ -92,12 +106,14 @@ public class Ball : MonoBehaviour
             float offset = (rb.position.x - hitPaddle.transform.position.x) / hitPaddle.HalfWidth;
             offset = Mathf.Clamp(offset, -1f, 1f);
             float angle = offset * maxBounceAngle * Mathf.Deg2Rad;
-            rb.linearVelocity = new Vector2(Mathf.Sin(angle), Mathf.Cos(angle)) * speed;
+            SpeedUp();
+            rb.linearVelocity = new Vector2(Mathf.Sin(angle), Mathf.Cos(angle)) * CurrentSpeed;
             SoundManager.PaddleHit();
         }
         else if (collision.collider.GetComponent<Brick>() != null)
         {
             // 블럭 소리는 Brick이 직접 재생 (깨짐 / 단단한 블럭 타격 구분)
+            SpeedUp(); // 속도는 다음 FixedUpdate에서 반영
         }
         else
         {

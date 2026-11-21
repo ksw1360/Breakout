@@ -80,7 +80,7 @@ public class GameManager : MonoBehaviour
         Level = level;
         levelTransition = false;
         bricksRemaining = brickField.Build(Levels.Get(level), level);
-        ball.speed = baseBallSpeed + speedPerLevel * (level - 1);
+        ball.baseSpeed = baseBallSpeed + speedPerLevel * (level - 1);
         ball.ResetToPaddle();
         RefreshUI();
 
