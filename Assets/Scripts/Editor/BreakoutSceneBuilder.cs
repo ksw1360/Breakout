@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -14,7 +13,7 @@ public static class BreakoutSceneBuilder
     const string SquarePath = SpriteFolder + "/Square.png";
     const string CirclePath = SpriteFolder + "/Circle.png";
     const string BounceMatPath = PhysicsFolder + "/BallBounce.physicsMaterial2D";
-    const string ScenePath = "Assets/Scenes/Breakout.unity";
+    const string ScenePath = BuildSettingsOrder.GameScene;
     const string UnlitMatPath = "Packages/com.unity.render-pipelines.universal/Runtime/Materials/Sprite-Unlit-Default.mat";
 
     // 플레이 영역 (월드 좌표)
@@ -178,7 +177,7 @@ public static class BreakoutSceneBuilder
         // 씬 저장 + 빌드 설정에 등록
         Directory.CreateDirectory(Path.GetDirectoryName(ScenePath));
         EditorSceneManager.SaveScene(scene, ScenePath);
-        AddSceneToBuildSettings(ScenePath);
+        BuildSettingsOrder.Apply();
 
         Debug.Log($"[Breakout] 씬 생성 완료: {ScenePath} — Play 버튼을 누르세요.");
     }
@@ -277,11 +276,4 @@ public static class BreakoutSceneBuilder
         return mat;
     }
 
-    static void AddSceneToBuildSettings(string path)
-    {
-        var scenes = new List<EditorBuildSettingsScene>(EditorBuildSettings.scenes);
-        scenes.RemoveAll(s => s.path == path);
-        scenes.Insert(0, new EditorBuildSettingsScene(path, true));
-        EditorBuildSettings.scenes = scenes.ToArray();
-    }
 }

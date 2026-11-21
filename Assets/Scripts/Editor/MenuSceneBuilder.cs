@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.Events;
 using UnityEditor.SceneManagement;
@@ -11,7 +10,7 @@ using UnityEngine.UI;
 
 public static class MenuSceneBuilder
 {
-    const string ScenePath = "Assets/Scenes/Menu.unity";
+    const string ScenePath = BuildSettingsOrder.MenuScene;
 
     static readonly Color ButtonColor = new Color(0.20f, 0.24f, 0.34f);
 
@@ -86,7 +85,7 @@ public static class MenuSceneBuilder
         menu.backButton = backBtn;
 
         EditorSceneManager.SaveScene(scene, ScenePath);
-        AddSceneToBuildSettings(ScenePath);
+        BuildSettingsOrder.Apply();
 
         Debug.Log($"[Breakout] 메뉴 씬 생성 완료: {ScenePath}");
     }
@@ -137,11 +136,4 @@ public static class MenuSceneBuilder
         return button;
     }
 
-    static void AddSceneToBuildSettings(string path)
-    {
-        var scenes = new List<EditorBuildSettingsScene>(EditorBuildSettings.scenes);
-        if (scenes.Exists(s => s.path == path)) return;
-        scenes.Add(new EditorBuildSettingsScene(path, true));
-        EditorBuildSettings.scenes = scenes.ToArray();
-    }
 }
