@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 
@@ -23,7 +24,8 @@ public static class BuildSettingsOrder
 
         foreach (var path in Ordered)
         {
-            if (string.IsNullOrEmpty(AssetDatabase.AssetPathToGUID(path, AssetPathToGUIDOptions.OnlyExistingAssets)))
+            // AssetDatabase는 SaveScene 직후 아직 GUID를 모를 수 있으므로 디스크 파일로 판단
+            if (!File.Exists(path))
                 continue; // 아직 생성되지 않은 씬
             result.Add(new EditorBuildSettingsScene(path, true));
         }
@@ -32,6 +34,9 @@ public static class BuildSettingsOrder
         bool changed = result.Count != current.Length ||
                        result.Where((s, i) => s.path != current[i].path || s.enabled != current[i].enabled).Any();
         if (changed)
+        {
             EditorBuildSettings.scenes = result.ToArray();
+            AssetDatabase.SaveAssets(); // ProjectSettings를 디스크에 반영
+        }
     }
 }
