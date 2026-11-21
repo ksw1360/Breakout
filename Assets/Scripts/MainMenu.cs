@@ -20,6 +20,11 @@ public class MainMenu : MonoBehaviour
 
     void Start()
     {
+#if UNITY_WEBGL && !UNITY_EDITOR
+        // 브라우저에서는 종료가 의미 없으므로 QUIT 버튼 숨김
+        var quit = mainPanel ? mainPanel.transform.Find("QuitButton") : null;
+        if (quit) quit.gameObject.SetActive(false);
+#endif
         ShowMain();
     }
 

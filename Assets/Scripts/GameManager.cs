@@ -18,6 +18,8 @@ public class GameManager : MonoBehaviour
     public Text messageText;
     public Fireworks fireworks;
     public ItemManager itemManager;
+    [Tooltip("게임 종료 화면의 RESTART / MENU 버튼 묶음 (터치용)")]
+    public GameObject endButtons;
 
     [Header("Rules")]
     public int startLives = 3;
@@ -51,6 +53,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        if (endButtons) endButtons.SetActive(false);
         if (!ValidateReferences()) return;
         LoadLevel(1);
     }
@@ -62,6 +65,7 @@ public class GameManager : MonoBehaviour
         if (!ball) missing.Add(nameof(ball));
         if (!brickField) missing.Add(nameof(brickField));
         if (!itemManager) missing.Add(nameof(itemManager));
+        if (!endButtons) missing.Add(nameof(endButtons));
         if (missing.Count == 0) return true;
 
         string msg = $"Scene is out of date (missing: {string.Join(", ", missing)}).\nRun Tools > Build Breakout Scene";
@@ -78,11 +82,13 @@ public class GameManager : MonoBehaviour
         if (kb == null) return;
         if (!IsGameOver) return;
 
-        if (kb.rKey.wasPressedThisFrame)
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        else if (kb.escapeKey.wasPressedThisFrame)
-            SceneManager.LoadScene(menuSceneName);
+        if (kb.rKey.wasPressedThisFrame) Restart();
+        else if (kb.escapeKey.wasPressedThisFrame) GoToMenu();
     }
+
+    // 종료 화면 버튼(터치/마우스)과 키보드 R/ESC가 함께 사용
+    public void Restart() => SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    public void GoToMenu() => SceneManager.LoadScene(menuSceneName);
 
     void LoadLevel(int level)
     {
@@ -93,8 +99,8 @@ public class GameManager : MonoBehaviour
         ResetToSingleBall(baseBallSpeed + speedPerLevel * (level - 1));
         RefreshUI();
 
-        string help = level == 1 ? "\nMove: Left/Right or A/D" : "";
-        ShowMessage($"LEVEL {level}\nPress SPACE to launch{help}");
+        string help = level == 1 ? "\nMove: Drag  or  Left/Right" : "";
+        ShowMessage($"LEVEL {level}\n{LaunchHint}{help}");
     }
 
     public void OnBrickDestroyed(int points)
@@ -158,7 +164,7 @@ public class GameManager : MonoBehaviour
         {
             SoundManager.BallLost();
             ResetToSingleBall(null);
-            ShowMessage("Press SPACE to launch");
+            ShowMessage(LaunchHint);
         }
     }
 
@@ -227,8 +233,11 @@ public class GameManager : MonoBehaviour
         itemManager.ResetAll();
         int rank = HighScores.Submit(Score);
         string rankLine = rank > 0 ? $"\nNEW HIGH SCORE!  #{rank}" : "";
-        ShowMessage($"{title}\nScore: {Score}{rankLine}\nR: Restart    ESC: Menu");
+        ShowMessage($"{title}\nScore: {Score}{rankLine}");
+        if (endButtons) endButtons.SetActive(true);
     }
+
+    const string LaunchHint = "Tap or press SPACE to launch";
 
     public void OnBallLaunched() => ShowMessage("");
 

@@ -8,10 +8,13 @@ public class Paddle : MonoBehaviour
     [Tooltip("패들 중심이 갈 수 있는 x 범위")]
     public float minX = -6.5f;
     public float maxX = 6.5f;
+    [Tooltip("터치/마우스 드래그 이동 배율 (1 = 손가락 이동량 그대로)")]
+    public float dragSensitivity = 1.3f;
 
     Rigidbody2D rb;
     Collider2D col;
     float input;
+    float pendingDrag; // 다음 FixedUpdate에 반영할 드래그 이동량
     float baseScaleX;
     float arenaMin, arenaMax; // 벽 안쪽 경계 (패들 폭이 바뀌어도 유지)
 
@@ -39,6 +42,8 @@ public class Paddle : MonoBehaviour
     void Update()
     {
         input = 0f;
+        pendingDrag += PointerInput.DragDeltaWorldX * dragSensitivity;
+
         var kb = Keyboard.current;
         if (kb == null) return;
         if (kb.leftArrowKey.isPressed || kb.aKey.isPressed) input -= 1f;
@@ -47,10 +52,13 @@ public class Paddle : MonoBehaviour
 
     void FixedUpdate()
     {
+        float drag = pendingDrag;
+        pendingDrag = 0f;
         if (GameManager.Instance != null && GameManager.Instance.IsGameOver) return;
 
         Vector2 pos = rb.position;
-        pos.x = Mathf.Clamp(pos.x + input * speed * Time.fixedDeltaTime, arenaMin + HalfWidth, arenaMax - HalfWidth);
+        float x = pos.x + input * speed * Time.fixedDeltaTime + drag;
+        pos.x = Mathf.Clamp(x, arenaMin + HalfWidth, arenaMax - HalfWidth);
         rb.MovePosition(pos);
     }
 }

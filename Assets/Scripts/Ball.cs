@@ -44,7 +44,8 @@ public class Ball : MonoBehaviour
         if (GameManager.Instance != null && GameManager.Instance.IsGameOver) return;
 
         var kb = Keyboard.current;
-        if (kb != null && kb.spaceKey.wasPressedThisFrame)
+        bool spacePressed = kb != null && kb.spaceKey.wasPressedThisFrame;
+        if (spacePressed || PointerInput.Tapped) // 탭으로도 발사
             Launch();
     }
 

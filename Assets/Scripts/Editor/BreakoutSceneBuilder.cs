@@ -138,12 +138,26 @@ public static class BreakoutSceneBuilder
             new Vector2(0.5f, 0.5f), new Vector2(0f, -120f));
         messageText.rectTransform.sizeDelta = new Vector2(1200f, 400f);
 
+        // 게임 종료 화면 버튼 (터치용) + 이를 위한 EventSystem
+        MenuSceneBuilder.CreateEventSystem();
+        var endButtons = new GameObject("EndButtons", typeof(RectTransform));
+        endButtons.transform.SetParent(canvasGo.transform, false);
+        var endRt = (RectTransform)endButtons.transform;
+        endRt.anchorMin = Vector2.zero;
+        endRt.anchorMax = Vector2.one;
+        endRt.offsetMin = endRt.offsetMax = Vector2.zero;
+        var restartBtn = MenuSceneBuilder.CreateButton("RestartButton", endButtons.transform, font, "RESTART", new Vector2(-270f, -390f));
+        var menuBtn = MenuSceneBuilder.CreateButton("MenuButton", endButtons.transform, font, "MENU", new Vector2(270f, -390f));
+
         // 게임 매니저
         var gmGo = new GameObject("GameManager");
         var gm = gmGo.AddComponent<GameManager>();
         gm.ball = ball;
         gm.brickField = brickField;
         gm.levelText = levelText;
+        gm.endButtons = endButtons;
+        UnityEditor.Events.UnityEventTools.AddPersistentListener(restartBtn.onClick, new UnityEngine.Events.UnityAction(gm.Restart));
+        UnityEditor.Events.UnityEventTools.AddPersistentListener(menuBtn.onClick, new UnityEngine.Events.UnityAction(gm.GoToMenu));
         gm.scoreText = scoreText;
         gm.livesText = livesText;
         gm.messageText = messageText;

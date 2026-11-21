@@ -34,9 +34,7 @@ public static class MenuSceneBuilder
         camGo.AddComponent<AudioListener>();
 
         // 이벤트 시스템 (새 Input System 전용 프로젝트이므로 InputSystemUIInputModule 사용)
-        var esGo = new GameObject("EventSystem");
-        esGo.AddComponent<EventSystem>();
-        esGo.AddComponent<InputSystemUIInputModule>().AssignDefaultActions();
+        CreateEventSystem();
 
         // 캔버스
         var canvasGo = new GameObject("Canvas");
@@ -103,7 +101,15 @@ public static class MenuSceneBuilder
         return go;
     }
 
-    static Button CreateButton(string name, Transform parent, Font font, string label, Vector2 position)
+    /// <summary>새 Input System용 EventSystem (마우스 + 터치 UI 입력).</summary>
+    internal static void CreateEventSystem()
+    {
+        var esGo = new GameObject("EventSystem");
+        esGo.AddComponent<EventSystem>();
+        esGo.AddComponent<InputSystemUIInputModule>().AssignDefaultActions();
+    }
+
+    internal static Button CreateButton(string name, Transform parent, Font font, string label, Vector2 position)
     {
         var go = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button));
         go.transform.SetParent(parent, false);
